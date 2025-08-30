@@ -1,7 +1,7 @@
 module "ec2_instance" {
   source        = "terraform-aws-modules/ec2-instance/aws"
   name          = "k3s-instance-1"
-  instance_type = "t3.micro"
+  instance_type = "t4g.small"
   key_name      = "k3s-lab"
   subnet_id     = "subnet-0540e75f"
 }
