@@ -5,3 +5,12 @@ module "ec2_instance" {
   key_name      = "k3s-lab"
   subnet_id     = "subnet-0540e75f"
 }
+
+resource "aws_security_group_rule" "allow_ssh" {
+  type      = "ingress"
+  from_port = 22
+  to_port   = 22
+  protocol  = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  security_group_id = module.ec2_instance.security_group_id
+}
