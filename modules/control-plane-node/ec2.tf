@@ -5,11 +5,12 @@ module "ec2_instance" {
   ami           = "ami-0bec58f5985730abf"
   key_name      = "k3s-lab"
   subnet_id     = var.subnet_id
+  user_data_replace_on_change = true
   user_data = <<-EOF
               #!/bin/bash
               set -e
-              apt-get update -y
-              apt-get install -y curl
+              yum update -y
+              yum install -y curl
               curl -sfL https://get.k3s.io | sh -
               mkdir -p /root/k3s
               cp /var/lib/rancher/k3s/server/node-token /root/k3s/node-token
