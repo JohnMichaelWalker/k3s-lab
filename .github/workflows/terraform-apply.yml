@@ -3,12 +3,12 @@ name: Terraform Apply
 on:
   pull_request:
     paths:
-      - 'k3s-lab/**.tf'
+      - 'live/**.tf'
       - 'modules/**.tf'
   push:
     branches: [ main ]
     paths:
-      - 'k3s-lab/**.tf'
+      - 'live/**.tf'
       - 'modules/**.tf'
   workflow_dispatch:
 
