@@ -3,15 +3,15 @@ provider "aws" {
 
   default_tags {
     tags = {
-      Project = "k3s-lab"
+      Project     = "k3s-lab"
       Environment = "dev"
-      ManagedBy = "terraform"
-      Role="control-plane-node"
+      ManagedBy   = "terraform"
+      Role        = "control-plane-node"
     }
   }
 }
 
 module "control-plane-node" {
-  source = "../../../modules/control-plane-node"
+  source   = "../../../modules/control-plane-node"
   vpc_cidr = "172.31.0.0/16"
 }
