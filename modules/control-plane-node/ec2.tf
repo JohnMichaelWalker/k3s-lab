@@ -10,7 +10,6 @@ module "ec2_instance" {
               #!/bin/bash
               set -e
               yum update -y
-              yum install -y curl
               curl -sfL https://get.k3s.io | sh -
               mkdir -p /root/k3s
               cp /var/lib/rancher/k3s/server/node-token /root/k3s/node-token
