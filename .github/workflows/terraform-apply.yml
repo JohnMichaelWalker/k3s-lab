@@ -1,21 +1,40 @@
 name: Terraform Apply
 
 on:
+  pull_request:
+    paths:
+      - 'k3s-lab/**.tf'
+      - 'modules/**.tf'
   push:
     branches: [ main ]
+    paths:
+      - 'k3s-lab/**.tf'
+      - 'modules/**.tf'
   workflow_dispatch:
 
 env:
-  AWS_REGION: eu-west-2
   TF_IN_AUTOMATION: "true"
+  TF_INPUT: false
+  TF_CLI_ARGS_plan: -no-color
+  TF_CLI_ARGS_apply: -no-color
+
 
 jobs:
   tf:
-    environment: terraform
+    strategy:
+      matrix:
+        include:
+          - name: dev-control-plane
+            dir: k3s-lab/live/dev/control-plane-node
+            region: eu-west-2
+            state_key: k3s-lab/dev/control-plane-node.tfstate
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -26,9 +45,42 @@ jobs:
       - name: Verify S3 access
         run: aws s3 ls s3://boss-eks-lab-terraform-state/
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform fmt
+        working-directory: ${{ matrix.dir }}
+        run: terraform fmt -check
 
       - name: Terraform Init
-        run: terraform init -input=false -reconfigure
-        
-      - run: terraform apply -input=false -auto-approve
+        working-directory: ${{ matrix.dir }}
+        run: terraform init \
+          -backend-config="bucket=boss-eks-lab-terraform-state" \
+          -backend-config="key=${{ matrix.state_key }}" \
+          -backend-config="region=${{ matrix.region }}" \
+          -backend-config="dynamodb_table=boss-eks-lab-terraform-locks" \
+          -backend-config="encrypt=true"
+
+      - name: Terraform validate
+        working-directory: ${{ matrix.dir }}
+        run: terraform validate
+
+      - name: Terraform plan
+        if: github.event_name == 'pull_request'
+        working-directory: ${{ matrix.dir }}
+        run: terraform plan -out=tfplan
+      - name: Upload plan
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-tfplan
+          path: ${{ matrix.dir }}/tfplan
+
+      - name: Terraform apply
+        if: github.event_name != 'pull_request'
+        working-directory: ${{ matrix.dir }}
+        run: |
+          terraform plan -out=tfplan
+          terraform apply -auto-approve tfplan
