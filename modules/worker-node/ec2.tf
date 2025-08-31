@@ -1,20 +1,10 @@
 module "ec2_instance" {
   source        = "terraform-aws-modules/ec2-instance/aws"
-  name          = "k3s-instance-1"
+  name          =  var.name
   instance_type = "t4g.small"
   ami           = "ami-0bec58f5985730abf"
   key_name      = "k3s-lab"
-  subnet_id     = var.subnet_id
-  user_data = <<-EOF
-              #!/bin/bash
-              set -e
-              apt-get update -y
-              apt-get install -y curl
-              curl -sfL https://get.k3s.io | sh -
-              mkdir -p /root/k3s
-              cp /var/lib/rancher/k3s/server/node-token /root/k3s/node-token
-              ln -s /usr/local/bin/kubectl /usr/bin/kubectl
-              EOF
+  subnet_id     = "subnet-0540e75f"
 }
 
 # For SSH Admin Access (public...)
