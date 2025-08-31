@@ -14,5 +14,5 @@ provider "aws" {
 module "control-plane-node" {
   source   = "../../../modules/control-plane-node"
   vpc_cidr = "172.31.0.0/16"
-  subnet_id = "subnet_id"
+  subnet_id = "subnet-0540e75f"
 }
