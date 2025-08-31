@@ -25,7 +25,7 @@ jobs:
       matrix:
         include:
           - name: dev-control-plane
-            dir: k3s-lab/live/dev/control-plane-node
+            dir: live/dev/control-plane-node
             region: eu-west-2
             state_key: k3s-lab/dev/control-plane-node.tfstate
     name: ${{ matrix.name }}
