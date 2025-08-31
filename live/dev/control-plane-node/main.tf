@@ -1,3 +1,8 @@
+# this is populated by github action
+terraform {
+  backend "s3" {}
+}
+
 provider "aws" {
   region = "eu-west-1"
 
