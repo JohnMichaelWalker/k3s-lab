@@ -4,7 +4,14 @@ module "ec2_instance" {
   instance_type = "t4g.small"
   ami           = "ami-0bec58f5985730abf"
   key_name      = "k3s-lab"
-  subnet_id     = "subnet-0540e75f"
+  subnet_id     = var.subnet_id
+  user_data_replace_on_change = true
+  user_data = <<-EOF
+              #!/bin/bash
+              set -e
+              yum update -y
+              curl -sfL https://get.k3s.io | K3S_URL='${var.control_plane_private_ip}' K3S_TOKEN='${var.cluster_token}' sh -
+              EOF
 }
 
 # For SSH Admin Access (public...)

@@ -10,7 +10,7 @@ module "ec2_instance" {
               #!/bin/bash
               set -e
               yum update -y
-              curl -sfL https://get.k3s.io | sh -
+              curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='server --write-kubeconfig-mode 644' K3S_TOKEN='${var.cluster_token}' sh -
               mkdir -p /root/k3s
               cp /var/lib/rancher/k3s/server/node-token /root/k3s/node-token
               ln -s /usr/local/bin/kubectl /usr/bin/kubectl
